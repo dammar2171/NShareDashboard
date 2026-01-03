@@ -1,0 +1,16 @@
+:root {
+  --bg:linear-gradient(180deg, rgba(10,14,24,0.96), rgba(10,14,24,0.92));
+  --card-bg: #1f2937;
+  --muted: rgba(20, 2, 2, 0.75);
+  --muted-2: rgba(255,255,255,0.48);
+  --accent-1: #5f7cff;
+  --accent-2: #63d6ff;
+  --pill-bg: rgba(123,97,255,0.12);
+  --chip-bg: rgba(255,255,255,0.02);
+}
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
