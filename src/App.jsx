@@ -9,6 +9,7 @@ import Quiz from "./pages/Quiz";
 import Notice from "./pages/Notice";
 import Setting from "./pages/Setting";
 import AdminLogin from "./components/AdminLogin";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -16,13 +17,62 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<AdminLogin />} />
-          <Route path="/" element={<AdminLayout />}>
-            <Route index element={<Overview />} />
-            <Route path="overview" element={<Overview />} />
-            <Route path="notes" element={<Notes />} />
-            <Route path="quiz" element={<Quiz />} />
-            <Route path="notice" element={<Notice />} />
-            <Route path="setting" element={<Setting />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route
+              index
+              element={
+                <ProtectedRoute>
+                  <Overview />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="overview"
+              element={
+                <ProtectedRoute>
+                  <Overview />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="notes"
+              element={
+                <ProtectedRoute>
+                  <Notes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="quiz"
+              element={
+                <ProtectedRoute>
+                  <Quiz />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="notice"
+              element={
+                <ProtectedRoute>
+                  <Notice />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="setting"
+              element={
+                <ProtectedRoute>
+                  <Setting />
+                </ProtectedRoute>
+              }
+            />
           </Route>
         </Routes>
       </Router>

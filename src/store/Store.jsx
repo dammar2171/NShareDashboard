@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createContext, useReducer } from "react";
 
 export const StoreContext = createContext();
@@ -82,6 +83,7 @@ const StoreContextProvider = ({ children }) => {
       date: "Nov 9, 2025",
     },
   ]);
+  const [authenticated, setAuthenticated] = useState(false);
 
   const AddNotes = (note) => {
     console.log("Store", note);
@@ -116,7 +118,16 @@ const StoreContextProvider = ({ children }) => {
   };
 
   return (
-    <StoreContext.Provider value={{ notes, AddNotes, UpdateNote, DeleteNote }}>
+    <StoreContext.Provider
+      value={{
+        notes,
+        authenticated,
+        setAuthenticated,
+        AddNotes,
+        UpdateNote,
+        DeleteNote,
+      }}
+    >
       {children}
     </StoreContext.Provider>
   );
