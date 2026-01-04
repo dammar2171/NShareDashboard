@@ -1,4 +1,5 @@
 function CommonList({ item, handleUpdate, hadleDelete }) {
+
   return (
     <div className="notes-list">
       <ul>

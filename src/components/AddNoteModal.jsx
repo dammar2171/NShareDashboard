@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "../css/AddNoteModal.css";
-
+import axios from "axios";
 function AddNoteModal({ show, onClose, onSave }) {
   const [formData, setFormData] = useState({
     image: "",
@@ -20,26 +20,53 @@ function AddNoteModal({ show, onClose, onSave }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newNote = {
-      id: Date.now(),
-      image: formData.image,
-      topPill: formData.topPill,
-      title: formData.title,
-      description: formData.description,
-      chips: formData.chips.split(","),
-      publisher: formData.publisher,
-      rating: formData.rating,
-      ratingCount: 0,
-      date: new Date().toDateString(),
-      authorSub: "",
-      pdfFile,
-    };
+    try {
+      const form = new FormData();
+      form.append("title", formData.title);
+      form.append("description", formData.description);
+      form.append("image", formData.image);
+      form.append("topPill", formData.topPill);
+      form.append("chips", JSON.stringify(formData.chips.split(",")));
+      form.append("publisher", formData.publisher);
+      form.append("rating", Number(formData.rating));
+      form.append("ratingCount", 0);
+      form.append("authorSub", "");
 
-    onSave(newNote);
-    onClose();
+      if (pdfFile) {
+        form.append("pdfFile", pdfFile);
+      }
+
+      const res = await axios.post(
+        "http://localhost:5000/notes/addNotes",
+        form,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const newNote = res.data.note || {
+        title: formData.title,
+        description: formData.description,
+        image: formData.image,
+        topPill: formData.topPill,
+        chips: formData.chips.split(","),
+        publisher: formData.publisher,
+        rating: Number(formData.rating),
+        ratingCount: 0,
+        authorSub: "",
+        pdf_url: res.data.pdf_url,
+        date: new Date().toDateString(),
+      };
+
+      onSave(newNote);
+      onClose();
+    } catch (error) {
+      console.error("Error uploading note:", error.response?.data || error);
+    }
   };
 
   return (

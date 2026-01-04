@@ -1,6 +1,15 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../css/Sidebar.css";
+import { useContext } from "react";
+import { StoreContext } from "../store/Store";
 const Sidebar = () => {
+  const { setAuthenticated } = useContext(StoreContext);
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    setAuthenticated(false);
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
   return (
     <div className="sidebar-container">
       <div className="sidebar-link">
@@ -21,7 +30,9 @@ const Sidebar = () => {
             <NavLink to="/setting">Setting</NavLink>
           </li>
           <li>
-            <button className="logout-btn">Logout</button>
+            <button onClick={handleLogout} className="logout-btn">
+              Logout
+            </button>
           </li>
         </ul>
       </div>

@@ -15,9 +15,6 @@ const AdminLogin = () => {
     e.preventDefault();
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
-
-    console.log(email, password);
-
     try {
       const response = await axios.post(
         "http://localhost:5000/admin/loginAdmin",
@@ -29,9 +26,14 @@ const AdminLogin = () => {
       if (!response) {
         return alert("logged in failed");
       }
-      localStorage.setItem("token", response.data.token);
-      setAuthenticated(true);
-      navigate("/");
+
+      const { token } = response.data;
+
+      if (token) {
+        localStorage.setItem("token", token);
+        setAuthenticated(true);
+        navigate("/");
+      }
     } catch (error) {
       console.log("Login_Error:", error);
     }

@@ -1,12 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import "../css/AddNoteModal.css";
 import { StoreContext } from "../store/Store";
+import axios from "axios";
 
 function UpdateNoteModal({ show, onClose, note }) {
   const { UpdateNote } = useContext(StoreContext);
   const [formData, setFormData] = useState({
     image: "",
-    topPill: "",
+    top_pill: "",
     title: "",
     description: "",
     chips: "",
@@ -20,7 +21,7 @@ function UpdateNoteModal({ show, onClose, note }) {
     if (note) {
       setFormData({
         image: note.image || "",
-        topPill: note.topPill || "",
+        top_pill: note.top_pill || "",
         title: note.title || "",
         description: note.description || "",
         chips: note.chips ? note.chips.join(",") : "",
@@ -36,26 +37,40 @@ function UpdateNoteModal({ show, onClose, note }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const updatedNote = {
-      ...note,
-      image: formData.image,
-      topPill: formData.topPill,
-      title: formData.title,
-      description: formData.description,
-      chips: formData.chips.split(","),
-      publisher: formData.publisher,
-      rating: formData.rating,
-      pdfFile,
-    };
+    try {
+      const form = new FormData();
+      form.append("title", formData.title);
+      form.append("description", formData.description);
+      form.append("image", formData.image);
+      form.append("top_pill", formData.top_pill);
+      form.append("chips", JSON.stringify(formData.chips.split(",")));
+      form.append("publisher", formData.publisher);
+      form.append("rating", Number(formData.rating));
 
-    console.log(updatedNote);
+      if (pdfFile) {
+        form.append("pdfFile", pdfFile);
+      }
 
-    UpdateNote(updatedNote);
-    alert("note updated sucessfully");
-    onClose();
+      const res = await axios.put(
+        `http://localhost:5000/notes/updateNotes/${note.id}`,
+        form,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      UpdateNote(res.data.note);
+
+      alert("Note updated successfully");
+      onClose();
+    } catch (error) {
+      console.error("Updation_Error:", error.response?.data || error);
+    }
   };
 
   return (
@@ -89,7 +104,7 @@ function UpdateNoteModal({ show, onClose, note }) {
           <input
             type="text"
             name="topPill"
-            value={formData.topPill}
+            value={formData.top_pill}
             placeholder="Category (Theory / Practical)"
             onChange={handleChange}
           />

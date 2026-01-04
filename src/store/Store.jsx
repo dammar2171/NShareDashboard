@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createContext, useReducer } from "react";
+import axios from "axios";
 
 export const StoreContext = createContext();
 
 const reducer = (state, action) => {
   switch (action.type) {
+    case "SET_NOTE":
+      return action.payload.note;
     case "ADD_NOTE":
       return [...state, action.payload.note];
     case "UPDATE_NOTE":
@@ -22,72 +25,15 @@ const reducer = (state, action) => {
 };
 
 const StoreContextProvider = ({ children }) => {
-  const [notes, dispatch] = useReducer(reducer, [
-    {
-      id: "1",
-      image:
-        "https://media.licdn.com/dms/image/v2/D5612AQHtZPSHvUUXpQ/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1681723080465?e=2147483647&v=beta&t=NUXPBf37D808LEVTyMnbNXA4sJRVOgU1xysxI-M7dvc",
-      topPill: "Theory",
-      title: "POM",
-      description:
-        "This is the complete note of the Project and organizational...",
-      chips: ["Notes", "Sem 6", "POM"],
-      publisher: "Dammar Bhatt",
-      authorSub: "",
-      rating: "4.0",
-      ratingCount: 2,
-      date: "Nov 9, 2025",
-    },
-    {
-      id: "2",
-      image:
-        "https://media.licdn.com/dms/image/v2/D5612AQHtZPSHvUUXpQ/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1681723080465?e=2147483647&v=beta&t=NUXPBf37D808LEVTyMnbNXA4sJRVOgU1xysxI-M7dvc",
-      topPill: "Theory",
-      title: "POM",
-      description:
-        "This is the complete note of the Project and organizational...",
-      chips: ["Notes", "Sem 6", "POM"],
-      publisher: "Dammar Bhatt",
-      authorSub: "",
-      rating: "4.0",
-      ratingCount: 2,
-      date: "Nov 9, 2025",
-    },
-    {
-      id: "3",
-      image:
-        "https://media.licdn.com/dms/image/v2/D5612AQHtZPSHvUUXpQ/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1681723080465?e=2147483647&v=beta&t=NUXPBf37D808LEVTyMnbNXA4sJRVOgU1xysxI-M7dvc",
-      topPill: "Theory",
-      title: "POM",
-      description:
-        "This is the complete note of the Project and organizational...",
-      chips: ["Notes", "Sem 6", "POM"],
-      publisher: "Dammar Bhatt",
-      authorSub: "",
-      rating: "4.0",
-      ratingCount: 2,
-      date: "Nov 9, 2025",
-    },
-    {
-      id: "4",
-      image:
-        "https://media.licdn.com/dms/image/v2/D5612AQHtZPSHvUUXpQ/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1681723080465?e=2147483647&v=beta&t=NUXPBf37D808LEVTyMnbNXA4sJRVOgU1xysxI-M7dvc",
-      topPill: "Theory",
-      title: "POM",
-      description: "This is picture related OS",
-      chips: ["Notes", "Sem 6", "POM"],
-      publisher: "Dammar Bhatt",
-      authorSub: "",
-      rating: "4.0",
-      ratingCount: 2,
-      date: "Nov 9, 2025",
-    },
-  ]);
-  const [authenticated, setAuthenticated] = useState(false);
+  const [notes, dispatch] = useReducer(reducer, []);
+  console.log(notes);
+
+  const [authenticated, setAuthenticated] = useState(() => {
+    const token = localStorage.getItem("token");
+    return !!token;
+  });
 
   const AddNotes = (note) => {
-    console.log("Store", note);
-
     const addNote = {
       type: "ADD_NOTE",
       payload: {
@@ -98,8 +44,6 @@ const StoreContextProvider = ({ children }) => {
   };
 
   const UpdateNote = (UpdatedNote) => {
-    console.log("store:", UpdatedNote);
-
     dispatch({
       type: "UPDATE_NOTE",
       payload: {
@@ -116,6 +60,32 @@ const StoreContextProvider = ({ children }) => {
       },
     });
   };
+
+  useEffect(() => {
+    async function fetchNote() {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/notes/fetchNotes",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        dispatch({
+          type: "SET_NOTE",
+          payload: {
+            note: response.data.data,
+          },
+        });
+      } catch (error) {
+        console.log("FETCH_ERROR:", error);
+      }
+    }
+    if (authenticated) {
+      fetchNote();
+    }
+  }, [authenticated]);
 
   return (
     <StoreContext.Provider

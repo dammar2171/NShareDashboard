@@ -5,18 +5,30 @@ import "../css/Common.css";
 import { StoreContext } from "../store/Store";
 import AddNoteModal from "../components/AddNoteModal";
 import UpdateNoteModal from "../components/UpdateNoteModal";
+import axios from "axios";
 const Notes = () => {
   const [showModal, setShowModal] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
 
   const { AddNotes, notes, DeleteNote } = useContext(StoreContext);
+
   const handleUpdate = (item) => {
     setSelectedNote(item);
     setShowUpdate(true);
   };
-  const handleDelete = (id) => {
-    DeleteNote(id);
+  const handleDelete = async (id) => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:5000/notes/deleteNotes/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      DeleteNote(id);
+    } catch (error) {}
   };
   const handleAdd = (note) => {
     AddNotes(note);
