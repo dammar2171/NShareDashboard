@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import axios from "axios";
 const AddQuizModal = ({ show, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     category: "",
@@ -31,13 +31,26 @@ const AddQuizModal = ({ show, onClose, onSave }) => {
     setQuestions(questions.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave({ ...formData, questions });
-
-    console.log({ ...formData, questions });
-
-    onClose();
+    try {
+      const res = axios.post(
+        "http://localhost:5000/quiz/addQuiz",
+        {
+          ...formData,
+          questions,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+      onSave({ ...formData, questions });
+      onClose();
+    } catch (error) {
+      console.log("ERROR:", error);
+    }
   };
 
   return (
