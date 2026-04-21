@@ -4,7 +4,7 @@ import axios from "axios";
 
 export const StoreContext = createContext();
 
-const reducer = (state, action) => {
+const noteReducer = (state, action) => {
   switch (action.type) {
     case "SET_NOTE":
       return action.payload.note;
@@ -14,7 +14,7 @@ const reducer = (state, action) => {
       return state.map((item) =>
         item.id === action.payload.UpdatedNote.id
           ? action.payload.UpdatedNote
-          : item
+          : item,
       );
     case "DELETE_NOTE":
       return state.filter((item) => item.id !== action.payload.id);
@@ -24,15 +24,34 @@ const reducer = (state, action) => {
   }
 };
 
+const quizReducer = (state, action) => {
+  switch (action.type) {
+    case "SET_QUIZ":
+      return action.payload.quiz;
+    case "ADD_QUIZ":
+      return [...state, action.payload.quiz];
+    case "UPDATE_QUIZ":
+      return state.map((item) =>
+        item.id === action.payload.UpdatedQuiz.id
+          ? action.payload.UpdatedQuiz
+          : item,
+      );
+    case "DELETE_QUIZ":
+      return state.filter((item) => item.id !== action.payload.id);
+    default:
+      return state;
+  }
+};
+
 const StoreContextProvider = ({ children }) => {
-  const [notes, dispatch] = useReducer(reducer, []);
-  console.log(notes);
+  const [notes, dispatch] = useReducer(noteReducer, []);
+  const [quiz, dispatchQuiz] = useReducer(quizReducer, []);
 
   const [authenticated, setAuthenticated] = useState(() => {
     const token = localStorage.getItem("token");
     return !!token;
   });
-
+// Notes Actions
   const AddNotes = (note) => {
     const addNote = {
       type: "ADD_NOTE",
@@ -70,7 +89,7 @@ const StoreContextProvider = ({ children }) => {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-          }
+          },
         );
         dispatch({
           type: "SET_NOTE",
@@ -86,6 +105,10 @@ const StoreContextProvider = ({ children }) => {
       fetchNote();
     }
   }, [authenticated]);
+
+
+
+  // Quiz Actions
 
   return (
     <StoreContext.Provider

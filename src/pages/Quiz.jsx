@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import CommanAdd from "../components/CommanAdd";
+import AddQuizModal from "../components/AddQuizModal";
 import CommonList from "../components/CommonList";
 
 function Quiz() {
+  const [showModal, setShowModal] = useState(false);
   const quizData = [
     {
       id: "1",
@@ -75,7 +77,12 @@ function Quiz() {
       <CommanAdd
         heading={"Welcome to Quiz Section"}
         buttonName={"Add quiz"}
-        handleAdd={handleAdd}
+        handleAdd={() => setShowModal(true)}
+      />
+      <AddQuizModal
+        onSave={handleAdd}
+        onClose={() => setShowModal(false)}
+        show={showModal}
       />
       {quizData.map((item) => (
         <CommonList
