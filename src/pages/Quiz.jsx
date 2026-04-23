@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import CommanAdd from "../components/CommanAdd";
 import AddQuizModal from "../components/AddQuizModal";
 import CommonList from "../components/CommonList";
+import { StoreContext } from "../store/Store";
 
 function Quiz() {
+  const { AddQuiz, quizs } = useContext(StoreContext);
   const [showModal, setShowModal] = useState(false);
+  console.log("quiz at quiz page:", quizs);
 
-  const handleAddData = (data)=>{
-    
-  }
+  const handleAddData = (data) => {
+    AddQuiz([...quizs, data]);
+  };
   return (
     <>
       <CommanAdd
@@ -21,14 +24,14 @@ function Quiz() {
         onClose={() => setShowModal(false)}
         show={showModal}
       />
-      {/* {quizData.map((item) => (
+      {quizs.map((item) => (
         <CommonList
           key={item.id}
           item={item}
-          hadleDelete={handleDelete}
-          handleUpdate={handleUpdate}
+          // hadleDelete={handleDelete}
+          // handleUpdate={handleUpdate}
         />
-      ))} */}
+      ))}
     </>
   );
 }

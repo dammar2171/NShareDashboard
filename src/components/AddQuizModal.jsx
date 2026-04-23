@@ -34,7 +34,7 @@ const AddQuizModal = ({ show, onClose, onSave }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = axios.post(
+      const res = await axios.post(
         "http://localhost:5000/quiz/addQuiz",
         {
           ...formData,
@@ -46,7 +46,12 @@ const AddQuizModal = ({ show, onClose, onSave }) => {
           },
         },
       );
-      onSave({ ...formData, questions });
+      console.log(res);
+
+      if (res.status === 201) {
+        onSave(res.data.quiz);
+        alert(res.data.message);
+      }
       onClose();
     } catch (error) {
       console.log("ERROR:", error);

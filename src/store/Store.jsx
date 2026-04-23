@@ -45,13 +45,13 @@ const quizReducer = (state, action) => {
 
 const StoreContextProvider = ({ children }) => {
   const [notes, dispatch] = useReducer(noteReducer, []);
-  const [quiz, dispatchQuiz] = useReducer(quizReducer, []);
+  const [quizs, dispatchQuiz] = useReducer(quizReducer, []);
 
   const [authenticated, setAuthenticated] = useState(() => {
     const token = localStorage.getItem("token");
     return !!token;
   });
-// Notes Actions
+  // Notes Actions
   const AddNotes = (note) => {
     const addNote = {
       type: "ADD_NOTE",
@@ -106,19 +106,26 @@ const StoreContextProvider = ({ children }) => {
     }
   }, [authenticated]);
 
-
-
   // Quiz Actions
-
+  const AddQuiz = (quiz) => {
+    dispatchQuiz({
+      type: "SET_QUIZ",
+      payload: {
+        quiz,
+      },
+    });
+  };
   return (
     <StoreContext.Provider
       value={{
         notes,
+        quizs,
         authenticated,
         setAuthenticated,
         AddNotes,
         UpdateNote,
         DeleteNote,
+        AddQuiz,
       }}
     >
       {children}
