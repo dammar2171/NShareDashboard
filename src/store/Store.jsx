@@ -109,12 +109,54 @@ const StoreContextProvider = ({ children }) => {
   // Quiz Actions
   const AddQuiz = (quiz) => {
     dispatchQuiz({
-      type: "SET_QUIZ",
+      type: "ADD_QUIZ",
       payload: {
         quiz,
       },
     });
   };
+
+  const DeleteQuiz = (id) => {
+    dispatchQuiz({
+      type: "DELETE_QUIZ",
+      payload: {
+        id,
+      },
+    });
+  };
+  const UpdateQuiz = (UpdatedQuiz) => {
+    dispatchQuiz({
+      type: "UPDATE_QUIZ",
+      payload: {
+        UpdatedQuiz,
+      },
+    });
+  };
+  useEffect(() => {
+    async function fetchQuiz() {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/quiz/fetchQuiz",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+        dispatchQuiz({
+          type: "SET_QUIZ",
+          payload: {
+            quiz: response.data.quizzes,
+          },
+        });
+      } catch (error) {
+        console.log("SET_ERROR:", error);
+      }
+    }
+    if (authenticated) {
+      fetchQuiz();
+    }
+  }, [authenticated]);
   return (
     <StoreContext.Provider
       value={{
@@ -126,6 +168,8 @@ const StoreContextProvider = ({ children }) => {
         UpdateNote,
         DeleteNote,
         AddQuiz,
+        DeleteQuiz,
+        UpdateQuiz,
       }}
     >
       {children}

@@ -1,14 +1,33 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-const AddQuizModal = ({ show, onClose, onSave }) => {
-  const [formData, setFormData] = useState({
-    category: "",
-    image: "",
-    description: "",
-    publisher: "",
-  });
 
+const initialFormData = {
+  category: "",
+  image: "",
+  description: "",
+  publisher: "",
+};
+
+const QuizUpdateModal = ({ show, onClose, onUpdate, quiz }) => {
+  const [formData, setFormData] = useState(initialFormData);
   const [questions, setQuestions] = useState([{ question: "", answer: "" }]);
+
+  // when quiz prop arrives, pre-fill the form with existing data
+  useEffect(() => {
+    if (quiz) {
+      setFormData({
+        category: quiz.category || "",
+        image: quiz.image_url || "",
+        description: quiz.description || "",
+        publisher: quiz.publisher || "",
+      });
+      setQuestions(
+        quiz.questions?.length > 0
+          ? quiz.questions
+          : [{ question: "", answer: "" }],
+      );
+    }
+  }, [quiz]); // runs every time a different quiz is passed in
 
   if (!show) return null;
 
@@ -34,41 +53,34 @@ const AddQuizModal = ({ show, onClose, onSave }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        "http://localhost:5000/quiz/addQuiz",
-        {
-          ...formData,
-          questions,
-        },
+      const res = await axios.put(
+        `http://localhost:5000/quiz/updateQuiz/${quiz.id}`,
+        { ...formData, questions },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         },
       );
-      console.log(res);
 
-      if (res.status === 201) {
-        onSave(res.data.quiz);
+      if (res.status === 200) {
+        console.log(res.data.quiz);
+
+        onUpdate(res.data.quiz);
         alert(res.data.message);
-        setFormData({
-          category: "",
-          image: "",
-          description: "",
-          publisher: "",
-        });
+        setFormData(initialFormData);
         setQuestions([{ question: "", answer: "" }]);
       }
       onClose();
     } catch (error) {
-      console.log("ERROR:", error);
+      console.log("UPDATE_ERROR:", error);
     }
   };
 
   return (
     <div className="modal-overlay">
-      <div className="modal-box">
-        <h3>Add New Quiz</h3>
+      <div className="modal-box" style={{ marginTop: "400px" }}>
+        <h3>Update Quiz</h3>
 
         <form onSubmit={handleSubmit}>
           <input
@@ -128,6 +140,7 @@ const AddQuizModal = ({ show, onClose, onSave }) => {
                 }
                 required
               />
+
               {questions.length > 1 && (
                 <button
                   type="button"
@@ -153,7 +166,7 @@ const AddQuizModal = ({ show, onClose, onSave }) => {
               Cancel
             </button>
             <button type="submit" className="save">
-              Save Quiz
+              Update Quiz
             </button>
           </div>
         </form>
@@ -162,4 +175,4 @@ const AddQuizModal = ({ show, onClose, onSave }) => {
   );
 };
 
-export default AddQuizModal;
+export default QuizUpdateModal;

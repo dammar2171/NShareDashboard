@@ -1,5 +1,4 @@
-function CommonList({ item, handleUpdate, hadleDelete }) {
-
+function CommonList({ item, handleUpdate, handleDelete }) {
   return (
     <div className="notes-list">
       <ul>
@@ -12,7 +11,7 @@ function CommonList({ item, handleUpdate, hadleDelete }) {
           </div>
           <div className="action-btn">
             <button onClick={() => handleUpdate(item)}>Update</button>
-            <button onClick={() => hadleDelete(item.id)}>Delete</button>
+            <button onClick={() => handleDelete(item.id)}>Delete</button>
           </div>
         </li>
       </ul>
