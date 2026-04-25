@@ -11,13 +11,11 @@ const initialFormData = {
 const QuizUpdateModal = ({ show, onClose, onUpdate, quiz }) => {
   const [formData, setFormData] = useState(initialFormData);
   const [questions, setQuestions] = useState([{ question: "", answer: "" }]);
-
-  // when quiz prop arrives, pre-fill the form with existing data
   useEffect(() => {
     if (quiz) {
       setFormData({
         category: quiz.category || "",
-        image: quiz.image_url || "",
+        image: quiz.image || "",
         description: quiz.description || "",
         publisher: quiz.publisher || "",
       });
@@ -27,7 +25,7 @@ const QuizUpdateModal = ({ show, onClose, onUpdate, quiz }) => {
           : [{ question: "", answer: "" }],
       );
     }
-  }, [quiz]); // runs every time a different quiz is passed in
+  }, [quiz]);
 
   if (!show) return null;
 
