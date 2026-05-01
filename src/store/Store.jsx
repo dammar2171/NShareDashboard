@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createContext, useReducer } from "react";
 import axios from "axios";
+import { use } from "react";
 
 export const StoreContext = createContext();
 
@@ -43,9 +44,23 @@ const quizReducer = (state, action) => {
   }
 };
 
+const noticeReducer = (state, action) => {
+  switch (action.type) {
+    case "SET_NOTICE":
+      return action.payload.notice;
+    case "ADD_NOTICE":
+      return [...state, action.payload.notice];
+    case "DELETE_NOTICE":
+      return state.filter((item) => item.id !== action.payload.id);
+    default:
+      return state;
+  }
+};
+
 const StoreContextProvider = ({ children }) => {
   const [notes, dispatch] = useReducer(noteReducer, []);
   const [quizs, dispatchQuiz] = useReducer(quizReducer, []);
+  const [notices, setNotices] = useReducer(noticeReducer, []);
 
   const [authenticated, setAuthenticated] = useState(() => {
     const token = localStorage.getItem("token");
@@ -157,11 +172,58 @@ const StoreContextProvider = ({ children }) => {
       fetchQuiz();
     }
   }, [authenticated]);
+
+  // Notice Actions
+  const AddNotice = (notice) => {
+    setNotices({
+      type: "ADD_NOTICE",
+      payload: {
+        notice,
+      },
+    });
+  };
+
+  const DeleteNotice = (id) => {
+    setNotices({
+      type: "DELETE_NOTICE",
+      payload: {
+        id,
+      },
+    });
+  };
+
+  useEffect(() => {
+    async function fetchNotice() {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/notice/fetchNotice",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+        setNotices({
+          type: "SET_NOTICE",
+          payload: {
+            notice: response.data.notices,
+          },
+        });
+      } catch (error) {
+        console.log("FETCH_ERROR:", error);
+      }
+    }
+    if (authenticated) {
+      fetchNotice();
+    }
+  }, [authenticated]);
+
   return (
     <StoreContext.Provider
       value={{
         notes,
         quizs,
+        notices,
         authenticated,
         setAuthenticated,
         AddNotes,
@@ -170,6 +232,8 @@ const StoreContextProvider = ({ children }) => {
         AddQuiz,
         DeleteQuiz,
         UpdateQuiz,
+        AddNotice,
+        DeleteNotice,
       }}
     >
       {children}

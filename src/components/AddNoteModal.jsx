@@ -46,7 +46,7 @@ function AddNoteModal({ show, onClose, onSave }) {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
       const newNote = res.data.note || {
         title: formData.title,
